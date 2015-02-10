@@ -76,3 +76,94 @@ model.fire("12");
 model.fire("11");
 model.fire("10");
 */
+
+var controller = {
+	guesses: 0,
+	processGuess: function(guess) {
+		var location = parseGuess(guess);
+		if (location) {
+			this.guesses++;
+			var hit = model.fire(location);
+			if (hit && model.shipsSunk === model.numShips) {
+				view.displayMessage("You sank all my battleships, in " + this.guesses + " guesses.");
+			}
+		}
+	}
+}; 
+
+// Parse guess
+function parseGuess(guess) {
+	var alphabet = ["A", "B", "C", "D", "E", "F", "G"];
+
+	// Make sure input is valid
+	if (guess === null || guess.length !== 2) {
+		alert("Oops, please enter a letter and a number on the board.");
+	} else {
+		// Gets first character of the guess
+		var firstChar = guess.charAt(0);
+		// indexOf gives a number 0-6
+		var row = alphabet.indexOf(firstChar);
+		// represents second character of guess
+		var column = guess.charAt(1);
+
+		// Making sure inputs are valid
+		if (isNaN(row) || isNaN(column)) {
+			alert("Oops, that isn't on the board.");
+		} else if (row < 0 || row >= model.boardSize || column < 0 || column >= model.boardSize) {
+				alert("Oops, that's off the board!");
+			} else {
+			return row + column;
+			}
+		}
+		return null;
+}
+
+/* Testing
+console.log(parseGuess("A0"));
+console.log(parseGuess("B6"));
+console.log(parseGuess("G3"));
+console.log(parseGuess("H0"));
+console.log(parseGuess("A7"));
+*/
+
+/* Testing
+controller.processGuess("A0");
+controller.processGuess("A6");
+controller.processGuess("B6");
+controller.processGuess("C6");
+controller.processGuess("C4");
+controller.processGuess("D4");
+controller.processGuess("E4");
+controller.processGuess("B0");
+controller.processGuess("B1");
+controller.processGuess("B2");
+*/
+
+function init() {
+	// get the player's guess from the form
+	var fireButton = document.getElementById("fireButton");
+	// get the player's guess if Fire! button is clicked
+	fireButton.onclick = handleFireButton;
+	var guessInput = document.getElementById("guessInput");
+	// get the player's guess if enter button is pressed 
+	guessInput.onkeypress = handleKeyPress;
+}
+
+function handleKeyPress(e) {
+	var fireButton = document.getElementById("fireButton");
+	if (e.keyCode === 13) {
+		fireButton.click();
+		return false;
+	}
+}
+
+function handleFireButton() {
+	// code to get the value from the form
+	var guessInput = document.getElementById("guessInput");
+	var guess = guessInput.value.toUpperCase();
+	// and get the guess to the controller
+	controller.processGuess(guess);
+	guessInput.value = "";
+}
+
+window.onload = init;
